@@ -65,6 +65,17 @@ jobs:
           size=$(du -h web/model/room.glb | cut -f1)
           echo "Vysledny GLB: **$size**" >> "$GITHUB_STEP_SUMMARY"
 
+      - name: Cache-bust assets
+        run: |
+          v="${GITHUB_SHA::8}"
+          # každé nasazení dostane vlastní URL pro CSS i pro všechny moduly,
+          # takže prohlížeč nikdy nesmíchá starý index.html s novým JS
+          sed -i -E "s#(\./(css/style\.css|js/main\.js))\"#\1?v=$v\"#g" web/index.html
+          sed -i -E "s#<html#<html data-build=\"$v\"#" web/index.html
+          sed -i -E "s#from \"(\./[a-z-]+\.js)\"#from \"\1?v=$v\"#g" web/js/*.js
+          echo "Verze assetů: $v" >> "$GITHUB_STEP_SUMMARY"
+          grep -o 'js/main.js?v=[0-9a-f]*' web/index.html || true
+
       - uses: actions/configure-pages@v5
 
       - uses: actions/upload-pages-artifact@v3

@@ -36,12 +36,17 @@ class App {
       toast("Model room.glb zatím není nasazený — ukazuji demo místnost.", 5200);
     }
 
-    this.ui.setParts(info.parts);
-    this.viewer.fitToModel(false);
-    this.updateClipRange();
-    this.updateMeta();
-    this.ui.syncControls();
-    this.readHash();
+    try {
+      this.ui.setParts(info.parts);
+      this.viewer.fitToModel(false);
+      this.updateClipRange();
+      this.updateMeta();
+      this.ui.syncControls();
+      this.readHash();
+    } catch (err) {
+      // Model je načtený – ovládání může být nekompletní, scéna poběží dál.
+      console.error("[viewer] nastavení panelu selhalo:", err);
+    }
 
     document.getElementById("loader").classList.add("hidden");
 
@@ -179,6 +184,7 @@ class App {
   }
 }
 
+console.info("[viewer] build " + (document.documentElement.dataset.build || "dev"));
 const app = new App();
 app.start().catch((err) => {
   console.error(err);

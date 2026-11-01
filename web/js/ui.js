@@ -1,4 +1,17 @@
-const $ = (id) => document.getElementById(id);
+// Náhrada za chybějící prvek: pohltí čtení i zápis, místo aby shodila
+// celý skript. Stane se to hlavně při nesouladu cache (starý index.html
+// k novému JS) – viewer pak sice přijde o jeden ovladač, ale naběhne.
+const MISSING = new Proxy(function () {}, {
+  get: (_t, key) => (key === "value" || key === "textContent" || key === "innerHTML" ? "" : MISSING),
+  set: () => true,
+  apply: () => MISSING,
+});
+
+const $ = (id) => {
+  const el = document.getElementById(id);
+  if (!el) console.warn(`[viewer] prvek #${id} na stránce není – přeskakuji`);
+  return el || MISSING;
+};
 
 export function toast(message, ms = 2200) {
   const el = $("toast");
