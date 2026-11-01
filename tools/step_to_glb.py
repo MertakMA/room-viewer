@@ -45,8 +45,11 @@ def convert_xcaf(src: Path, dst: Path, lin_tol: float, ang_tol: float) -> None:
     from OCP.XCAFDoc import XCAFDoc_DocumentTool
 
     app = XCAFApp_Application.GetApplication_s()
-    doc = TDocStd_Document(TCollection_ExtendedString("MDTV-CAF"))
-    app.NewDocument_s(TCollection_ExtendedString("MDTV-CAF"), doc)
+    fmt = TCollection_ExtendedString("MDTV-CAF")
+    doc = TDocStd_Document(fmt)
+    # OCP vystavuje NewDocument jako metodu instance; starsi build mel staticke _s
+    new_doc = getattr(app, "NewDocument", None) or getattr(app, "NewDocument_s")
+    new_doc(fmt, doc)
 
     reader = STEPCAFControl_Reader()
     reader.SetColorMode(True)
@@ -72,6 +75,7 @@ def convert_xcaf(src: Path, dst: Path, lin_tol: float, ang_tol: float) -> None:
         shape = shape_tool.GetShape_s(labels.Value(i))
         BRepMesh_IncrementalMesh(shape, lin_tol, False, ang_tol, True)
 
+    log(f"XCAF: zapisuji {dst.name} (barvy a nazvy dilu zachovany)")
     writer = RWGltf_CafWriter(TCollection_AsciiString(str(dst)), True)  # True = binarni .glb
     ok = writer.Perform(doc, TColStd_IndexedDataMapOfStringString(), Message_ProgressRange())
     if not ok:
