@@ -11,12 +11,15 @@ model/room.step   ──►  Actions (OCCT)  ──►  web/model/room.glb  ─�
 ## Jak to zprovoznit
 
 1. **Zapni Pages**: Settings → Pages → *Source: GitHub Actions*.
-2. **Nainstaluj Git LFS** (STEP soubory jdou přes LFS, viz `.gitattributes`):
-   ```bash
-   git lfs install
-   ```
-3. **Vlož model**: `model/room.step` → commit → push. Workflow se spustí sám.
-4. Hotovo. Adresa je `https://<uživatel>.github.io/room-viewer/`.
+2. **Vlož model**: `model/room.step` → commit → push. Workflow se spustí sám.
+   Jde i přes webové rozhraní GitHubu (*Add file → Upload files*).
+3. Hotovo. Adresa je `https://<uživatel>.github.io/room-viewer/`.
+
+STEP se commituje jako obyčejný binární soubor, ne přes Git LFS —
+nahrávání přes web LFS pravidla ignoruje, takže by se obsah repa
+rozcházel podle toho, odkud model přijde. Pro pár set kilobajtů na
+revizi je prostý git v pohodě; kdyby modely narostly do desítek MB,
+přejdi na LFS, ale pak už commituj výhradně z klienta s `git lfs`.
 
 Dokud v `model/` žádný STEP není, viewer ukáže **ukázkovou místnost**,
 takže stránka funguje hned po prvním nasazení.
