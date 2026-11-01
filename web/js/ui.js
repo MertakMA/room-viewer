@@ -85,12 +85,15 @@ export function bindUI(app) {
     app.updateClipRange();
     app.updateMeta();
   });
-  $("in-zup").addEventListener("change", (e) => {
-    viewer.zUp = e.target.checked;
+  $("in-up").addEventListener("change", (e) => {
+    viewer.upAxis = e.target.value;
     viewer.applyTransform();
     viewer.fitToModel();
     app.updateClipRange();
     app.updateMeta();
+    $("up-hint").innerHTML =
+      `Aby to tak zůstalo i ostatním, dej v <code>web/js/config.js</code> ` +
+      `<code>defaultUpAxis: "${viewer.upAxis}"</code>.`;
   });
 
   // ---- sdílení a snímek ----
@@ -146,7 +149,7 @@ export function bindUI(app) {
       $("out-eye").textContent = `${fmt(walk.eyeHeight)} m`;
       $("out-speed").textContent = `${fmt(walk.speed, 1)} m/s`;
       $("in-units").value = String(viewer.unitScale);
-      $("in-zup").checked = viewer.zUp;
+      $("in-up").value = viewer.upAxis;
       $("in-scale").value = String(Math.log10(viewer.userScale));
       applyClip();
     },

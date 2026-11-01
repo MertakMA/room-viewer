@@ -1,5 +1,5 @@
 // Výchozí nastavení prohlížeče. Hodnoty jde přepsat i v URL, např.
-//   index.html?units=0.001&zup=1&mode=walk
+//   index.html?units=0.001&up=z-&mode=walk
 export const CONFIG = {
   // kde CI ukládá převedený model
   modelUrl: "./model/room.glb",
@@ -7,8 +7,9 @@ export const CONFIG = {
   // 0.001 = model je v milimetrech (typický STEP z Inventoru)
   defaultUnitScale: 0.001,
 
-  // STEP/Inventor má obvykle osu Z nahoru, glTF a three.js Y nahoru
-  defaultZUp: true,
+  // Která osa modelu míří nahoru: "z+", "z-", "y+", "y-".
+  // STEP z Inventoru bývá "z+"; když model stojí na hlavě, je to "z-".
+  defaultUpAxis: "z-",
 
   // chůze
   eyeHeight: 1.65,     // m

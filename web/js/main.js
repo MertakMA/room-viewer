@@ -22,7 +22,8 @@ class App {
   async start() {
     const params = new URLSearchParams(location.search);
     if (params.has("units")) this.viewer.unitScale = parseFloat(params.get("units"));
-    if (params.has("zup")) this.viewer.zUp = params.get("zup") !== "0";
+    if (params.has("up")) this.viewer.upAxis = params.get("up");
+    else if (params.has("zup")) this.viewer.upAxis = params.get("zup") === "0" ? "y+" : "z+";
 
     const bar = document.getElementById("loader-bar");
     const info = await this.viewer.load(CONFIG.modelUrl, (p) => {
@@ -141,7 +142,7 @@ class App {
       `t=${r(t.x)},${r(t.y)},${r(t.z)}`,
       `s=${r(v.userScale)}`,
       `u=${v.unitScale}`,
-      `z=${v.zUp ? 1 : 0}`,
+      `a=${v.upAxis}`,
     ];
     if (this.spawn) parts.push(`w=${r(this.spawn.x)},${r(this.spawn.y)},${r(this.spawn.z)}`);
     const url = new URL(location.href);
@@ -161,7 +162,8 @@ class App {
     const v = this.viewer;
 
     if (q.has("u")) v.unitScale = parseFloat(q.get("u"));
-    if (q.has("z")) v.zUp = q.get("z") === "1";
+    if (q.has("a")) v.upAxis = q.get("a");
+    else if (q.has("z")) v.upAxis = q.get("z") === "1" ? "z+" : "y+";
     if (q.has("s")) v.userScale = parseFloat(q.get("s")) || 1;
     v.applyTransform();
 

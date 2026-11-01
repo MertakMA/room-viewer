@@ -47,9 +47,14 @@ snímek do PNG a **odkaz na konkrétní pohled** (uloží kameru do URL).
 ## Jednotky a orientace
 
 STEP z Inventoru bývá v **milimetrech** s osou **Z nahoru**; viewer to
-takhle předpokládá a převádí na metry s osou Y nahoru. Když model vyjde
-tisíckrát větší nebo položený na boku, přepni to v panelu *Vzhled* —
-nebo natrvalo v `web/js/config.js` (`defaultUnitScale`, `defaultZUp`).
+takhle předpokládá a převádí na metry s osou Y nahoru.
+
+Když model vyjde tisíckrát větší nebo menší, přepni *Jednotky modelu*.
+Když stojí na hlavě nebo leží na boku, přepni *Orientace modelu* —
+`Z dolů` spraví převrácený model, `Y nahoru` model, který už je
+otočený. Jakmile najdeš správnou kombinaci, zapiš ji natrvalo do
+`web/js/config.js` (`defaultUnitScale`, `defaultUpAxis`), ať ji
+nemusí hledat každý, komu odkaz pošleš.
 
 ## Struktura
 

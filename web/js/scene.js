@@ -66,7 +66,7 @@ export class Viewer {
 
     this.clipPlane = new THREE.Plane(new THREE.Vector3(0, -1, 0), 1e6);
     this.unitScale = CONFIG.defaultUnitScale;
-    this.zUp = CONFIG.defaultZUp;
+    this.upAxis = CONFIG.defaultUpAxis;
     this.userScale = 1;
     this.isDemo = false;
 
@@ -74,6 +74,17 @@ export class Viewer {
     this._resize = this._resize.bind(this);
     window.addEventListener("resize", this._resize);
     this._resize();
+  }
+
+  /** Sklopení modelu podle toho, která jeho osa míří nahoru. */
+  static upRotation(axis) {
+    switch (axis) {
+      case "z+": return -Math.PI / 2;   // STEP/Inventor, výchozí
+      case "z-": return Math.PI / 2;    // Z míří dolů – model stojí na hlavě
+      case "y-": return Math.PI;        // převrácené Y
+      case "y+":
+      default: return 0;                // už je v orientaci glTF
+    }
   }
 
   _buildMarker() {
@@ -161,7 +172,7 @@ export class Viewer {
     const g = this.modelGroup;
     const s = this.isDemo ? this.userScale : this.unitScale * this.userScale;
     g.position.set(0, 0, 0);
-    g.rotation.set(this.isDemo ? 0 : (this.zUp ? -Math.PI / 2 : 0), 0, 0);
+    g.rotation.set(this.isDemo ? 0 : Viewer.upRotation(this.upAxis), 0, 0);
     g.scale.setScalar(s);
     g.updateMatrixWorld(true);
 
