@@ -4,12 +4,14 @@ export const CONFIG = {
   // kde CI ukládá převedený model
   modelUrl: "./model/room.glb",
 
-  // 0.001 = model je v milimetrech (typický STEP z Inventoru)
-  defaultUnitScale: 0.001,
+  // "auto" pozná metry i milimetry z velikosti modelu; jde zadat i číslo
+  // (0.001 = milimetry, 1 = metry), pokud chceš mít jistotu.
+  defaultUnitScale: "auto",
 
   // Která osa modelu míří nahoru: "z+", "z-", "y+", "y-".
-  // STEP z Inventoru bývá "z+"; když model stojí na hlavě, je to "z-".
-  defaultUpAxis: "z-",
+  // OCCT zapisuje glTF podle specifikace s osou Y nahoru, takže převedený
+  // model už je srovnaný. "z+"/"z-" je tu pro GLB z jiných nástrojů.
+  defaultUpAxis: "y+",
 
   // chůze
   eyeHeight: 1.65,     // m

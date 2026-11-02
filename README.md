@@ -49,15 +49,19 @@ snímek do PNG a **odkaz na konkrétní pohled** (uloží kameru do URL).
 
 ## Jednotky a orientace
 
-STEP z Inventoru bývá v **milimetrech** s osou **Z nahoru**; viewer to
-takhle předpokládá a převádí na metry s osou Y nahoru.
+Převod přes OCCT zapisuje glTF podle specifikace — **v metrech a s osou
+Y nahoru** — takže model je po převodu srovnaný a viewer s ním nic
+dalšího nedělá. Jednotky navíc pozná sám z velikosti modelu, takže si
+poradí i s GLB z jiných nástrojů, které nechávají milimetry.
 
-Když model vyjde tisíckrát větší nebo menší, přepni *Jednotky modelu*.
-Když stojí na hlavě nebo leží na boku, přepni *Orientace modelu* —
-`Z dolů` spraví převrácený model, `Y nahoru` model, který už je
-otočený. Jakmile najdeš správnou kombinaci, zapiš ji natrvalo do
-`web/js/config.js` (`defaultUnitScale`, `defaultUpAxis`), ať ji
-nemusí hledat každý, komu odkaz pošleš.
+Kdyby model vyšel na boku nebo v nesmyslné velikosti, přepni
+*Jednotky modelu* a *Orientace modelu* v panelu *Vzhled*; panel ti
+rovnou vypíše, co zapsat do `web/js/config.js` (`defaultUnitScale`,
+`defaultUpAxis`), ať to platí i pro ostatní.
+
+Centimetry a palce se automaticky nehádají — velká hala v metrech
+a malá místnost v centimetrech vycházejí stejně, takže se u nich
+spoléhá na ruční volbu.
 
 ## Struktura
 

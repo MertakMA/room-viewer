@@ -92,7 +92,7 @@ export function bindUI(app) {
   $("in-wire").addEventListener("change", (e) => viewer.setWireframe(e.target.checked));
   $("in-shadow").addEventListener("change", (e) => viewer.setShadows(e.target.checked));
   $("in-units").addEventListener("change", (e) => {
-    viewer.unitScale = parseFloat(e.target.value);
+    viewer.unitScale = e.target.value === "auto" ? "auto" : parseFloat(e.target.value);
     viewer.applyTransform();
     viewer.fitToModel();
     app.updateClipRange();
@@ -162,6 +162,9 @@ export function bindUI(app) {
       $("out-eye").textContent = `${fmt(walk.eyeHeight)} m`;
       $("out-speed").textContent = `${fmt(walk.speed, 1)} m/s`;
       $("in-units").value = String(viewer.unitScale);
+      $("units-hint").textContent = viewer.unitScale === "auto"
+        ? `Rozpoznáno: 1 jednotka = ${viewer.effectiveUnitScale} m`
+        : "";
       $("in-up").value = viewer.upAxis;
       $("in-scale").value = String(Math.log10(viewer.userScale));
       applyClip();

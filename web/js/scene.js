@@ -14,7 +14,7 @@ export class Viewer {
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.0;
     this.renderer.shadowMap.enabled = true;
-    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    this.renderer.shadowMap.type = THREE.PCFShadowMap;
     container.appendChild(this.renderer.domElement);
 
     this.scene = new THREE.Scene();
@@ -43,7 +43,7 @@ export class Viewer {
     this.scene.add(this.sun.target);
 
     const pmrem = new THREE.PMREMGenerator(this.renderer);
-    this.scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.06).texture;
+    this.scene.environment = pmrem.fromScene(new RoomEnvironment()).texture;
     this.scene.environmentIntensity = 0.55;
     pmrem.dispose();
 
@@ -149,6 +149,13 @@ export class Viewer {
     });
 
     this.parts = this._collectParts(root);
+
+    // Syrová velikost modelu, než na něj sáhneme měřítkem – podle ní
+    // se pozná, jestli přišel v metrech, nebo v milimetrech.
+    root.updateMatrixWorld(true);
+    const raw = new THREE.Box3().setFromObject(root);
+    this.rawSize = raw.isEmpty() ? new THREE.Vector3(1, 1, 1) : raw.getSize(new THREE.Vector3());
+
     this.applyTransform();
     return { isDemo: this.isDemo, meshCount: this.meshes.length, parts: this.parts };
   }
@@ -166,11 +173,31 @@ export class Viewer {
       .map((o, i) => ({ object: o, name: o.name && o.name.trim() ? o.name : `Část ${i + 1}` }));
   }
 
+  /**
+   * Odhadne jednotky z velikosti modelu. Místnost má v metrech jednotky
+   * řádu jednotek až desítek; když vyjde tisíckrát víc, přišla v
+   * milimetrech. OCCT zapisuje glTF podle specifikace v metrech, cesta
+   * přes cadquery umí nechat milimetry – tohle pokryje obojí.
+   */
+  detectUnitScale() {
+    const span = Math.max(this.rawSize?.x || 0, this.rawSize?.y || 0, this.rawSize?.z || 0);
+    if (!span) return 1;
+    if (span > 300) return 0.001;      // milimetry
+    if (span < 0.05) return 1000;      // model přišel tisíckrát zmenšený
+    return 1;                          // metry
+    // Centimetry a palce schválně nehádám – velká hala v metrech a
+    // malá místnost v centimetrech vycházejí stejně. Od toho je ruční volba.
+  }
+
+  get effectiveUnitScale() {
+    return this.unitScale === "auto" ? this.detectUnitScale() : this.unitScale;
+  }
+
   /** Použije jednotky, orientaci a uživatelské měřítko; podlahu srovná na y = 0. */
   applyTransform() {
     if (!this.modelRoot) return;
     const g = this.modelGroup;
-    const s = this.isDemo ? this.userScale : this.unitScale * this.userScale;
+    const s = this.isDemo ? this.userScale : this.effectiveUnitScale * this.userScale;
     g.position.set(0, 0, 0);
     g.rotation.set(this.isDemo ? 0 : Viewer.upRotation(this.upAxis), 0, 0);
     g.scale.setScalar(s);
@@ -205,6 +232,9 @@ export class Viewer {
     cam.near = 0.1; cam.far = r * 4;
     cam.updateProjectionMatrix();
 
+    // Near musí sedět na velikost scény, jinak malý model propadne
+    // před ořezovou rovinu a zmizí, i když ho kamera míří přesně.
+    this.camera.near = Math.max(0.005, Math.min(0.05, span / 400));
     this.camera.far = Math.max(2000, span * 20);
     this.camera.updateProjectionMatrix();
   }

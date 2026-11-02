@@ -10,7 +10,7 @@ class App {
     this.walk = new WalkController(this.viewer);
     this.mode = "orbit";
     this.spawn = null;
-    this.clock = new THREE.Clock();
+    this.lastFrame = performance.now();
     this.ui = bindUI(this);
 
     this.walk.onLockChange = (locked) => {
@@ -21,7 +21,10 @@ class App {
 
   async start() {
     const params = new URLSearchParams(location.search);
-    if (params.has("units")) this.viewer.unitScale = parseFloat(params.get("units"));
+    if (params.has("units")) {
+      const u = params.get("units");
+      this.viewer.unitScale = u === "auto" ? "auto" : parseFloat(u);
+    }
     if (params.has("up")) this.viewer.upAxis = params.get("up");
     else if (params.has("zup")) this.viewer.upAxis = params.get("zup") === "0" ? "y+" : "z+";
 
@@ -47,6 +50,13 @@ class App {
       // Model je načtený – ovládání může být nekompletní, scéna poběží dál.
       console.error("[viewer] nastavení panelu selhalo:", err);
     }
+
+    const sz = this.viewer.bounds.getSize(new THREE.Vector3());
+    console.info("[viewer] model:", info.isDemo ? "demo" : CONFIG.modelUrl,
+      "| sítí:", info.meshCount,
+      "| syrová velikost:", this.viewer.rawSize?.toArray().map((n) => +n.toFixed(3)),
+      "| jednotka:", this.viewer.effectiveUnitScale, "m",
+      "| výsledek:", sz.toArray().map((n) => +n.toFixed(2)), "m");
 
     document.getElementById("loader").classList.add("hidden");
 
@@ -129,7 +139,9 @@ class App {
   }
 
   frame() {
-    const dt = Math.min(this.clock.getDelta(), 0.1);
+    const now = performance.now();
+    const dt = Math.min((now - this.lastFrame) / 1000, 0.1);
+    this.lastFrame = now;
     if (this.mode === "walk") this.walk.update(dt);
     else this.viewer.controls.update();
     this.viewer.render();

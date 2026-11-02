@@ -106,18 +106,20 @@
       <label class="check"><input type="checkbox" id="in-shadow" checked /> <span>Stíny</span></label>
       <label class="row"><span>Jednotky modelu</span></label>
       <select id="in-units">
-        <option value="0.001" selected>milimetry (STEP z Inventoru)</option>
+        <option value="auto" selected>automaticky podle velikosti</option>
+        <option value="0.001">milimetry (STEP z Inventoru)</option>
         <option value="0.01">centimetry</option>
         <option value="1">metry</option>
         <option value="0.0254">palce</option>
       </select>
       <label class="row"><span>Orientace modelu</span></label>
       <select id="in-up">
-        <option value="z+" selected>Z nahoru (STEP z Inventoru)</option>
+        <option value="z+">Z nahoru (STEP z Inventoru)</option>
         <option value="z-">Z dolů (model stojí na hlavě)</option>
-        <option value="y+">Y nahoru (model je už otočený)</option>
+        <option value="y+" selected>Y nahoru (převod z STEPu, výchozí)</option>
         <option value="y-">Y dolů</option>
       </select>
+      <p class="hint" id="units-hint"></p>
       <p class="hint" id="up-hint">Když model visí vzhůru nohama, zkus <b>Z dolů</b>.</p>
     </section>
 
